@@ -1,7 +1,7 @@
-- name: Restart ketadb - {{ketadb_node_config['node.name']}}
+- name: Start ketadb - mysql
   supervisorctl:
-    name: ketadb_{{ketadb_node_config['node.name']}}
-    state: restarted
+    name: ketadb_mysql
+    state: started
     config: /home/{{ketadb_user}}/supervisor/supervisord.conf
     supervisorctl_path: /home/{{ketadb_user}}/.local/bin/supervisorctl
 

@@ -1,0 +1,5 @@
+ketadb_mysql_data_dir: data
+ketadb_mysql_port: 3306
+ketadb_mysql_user: keta
+ketadb_mysql_password: 654321
+ketadb_mysql_timezone: "+08:00"

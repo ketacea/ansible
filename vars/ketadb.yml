@@ -1,8 +1,9 @@
 # 用户
 ketadb_user: keta
 
-# 安装包的版本，必填（是）
+# ketadb的安装包
 ketadb_version: v1.2.0
+ketadb_file: /tmp/keta-v1.2.0-apps.tar.gz
 
-# 安装包的文件路径，必填（是）
-ketadb_file: /userdata/temp/keta-v1.2.0-apps.tar.gz
+# mysql的安装包
+ketadb_mysql_file: /tmp/mysql-8.0.33.tar.xz

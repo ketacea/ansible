@@ -3,7 +3,7 @@
 ## 介绍
 本项目，用于快速部署和管理ketadb平台
 
-## 一、准备环境
+## 准备环境
 
 + 使用docker-compose创建测试环境，用于测试环节，如果有远端机器，则跳过
 
@@ -39,14 +39,40 @@ make ansible-mac-install
 ./ansible-playbook.sh tasks/supervisor.yml -K -t stop
 ```
 
-## 二、部署ketadb
+## MySQL
 
-+ 安装ketadb
++ 下载
+
+```shell
+wget https://dev.mysql.com/get/Downloads/MySQL-8.0/mysql-8.0.33-linux-glibc2.12-x86_64.tar.xz -O /tmp/mysql-8.0.33.tar.xz
+```
+
++ 安装、加载、启动
+
+```shell
+./ansible-playbook.sh tasks/mysql.yml -t install,reread,start
+
+# 重启、停止、状态
+./ansible-playbook.sh tasks/mysql.yml -t restart
+./ansible-playbook.sh tasks/mysql.yml -t stop
+./ansible-playbook.sh tasks/mysql.yml -t status
+```
+
+## KetaDB
+
++ 下载
+
+```shell
+wget https://[xishuhq-官网]/downloads/keta-v1.2.0-apps.tar.gz -O /tmp/keta-v1.2.0-apps.tar.gz
+```
+
++ 安装、加载、启动
 
 ```shell
 ./ansible-playbook.sh tasks/ketadb.yml -t install,reread,start
 
-# 重启、停止
+# 重启、停止、状态
 ./ansible-playbook.sh tasks/ketadb.yml -t restart
 ./ansible-playbook.sh tasks/ketadb.yml -t stop
+./ansible-playbook.sh tasks/ketadb.yml -t status
 ```

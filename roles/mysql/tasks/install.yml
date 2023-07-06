@@ -1,0 +1,86 @@
+- name: fetch supervisor mysql stat
+  stat:
+    path: "/home/{{ketadb_user}}/supervisor/conf.d/ketadb_mysql.conf"
+  register: mysql_stat
+
+- name: stop supervisor mysql
+  supervisorctl:
+    name: ketadb_mysql
+    state: stopped
+    config: /home/{{ketadb_user}}/supervisor/supervisord.conf
+    supervisorctl_path: /home/{{ketadb_user}}/.local/bin/supervisorctl
+  when: mysql_stat.stat.exists
+
+- name: ensure no mysql running
+  shell: >-
+    ps -ef | grep -v grep | grep -w 'mysqld' | awk '{print $2}' | xargs kill -9
+  ignore_errors: true
+
+- name: delete mysql directory data and logs
+  file:
+    path: "{{item}}"
+    state: absent
+  loop:
+    - "/home/{{ketadb_user}}/mysql/data"
+    - "/home/{{ketadb_user}}/mysql/logs"
+
+- name: ensure package and workspace directory exists
+  file:
+    path: "{{item}}"
+    state: directory
+    mode: 0755
+    recurse: yes
+  loop:
+    - "/home/{{ketadb_user}}/mysql"
+    - "/home/{{ketadb_user}}/mysql/data"
+    - "/home/{{ketadb_user}}/mysql/logs"
+
+- name: copy package file to remote package directory
+  copy:
+    src: "{{ketadb_mysql_file}}"
+    dest: "/tmp/ketadb_mysql.tar.gz"
+
+- name: untar package file to workspace
+  unarchive:
+    src: "/tmp/ketadb_mysql.tar.gz"
+    dest: "/home/{{ketadb_user}}/mysql"
+    extra_opts: "--strip-components=1"
+    remote_src: yes
+    creates: "/home/{{ketadb_user}}/mysql/bin/mysqld"
+
+- name: copy my.cnf
+  template:
+    src: my.cnf.j2
+    dest: "/home/{{ketadb_user}}/mysql/my.cnf"
+
+- name: fetch temporary password
+  shell: >-
+    /home/{{ketadb_user}}/mysql/bin/mysqld --defaults-file=/home/{{ketadb_user}}/mysql/my.cnf --initialize && 
+    cat /home/{{ketadb_user}}/mysql/logs/error.log | grep 'temporary password' | awk '{print $NF}'
+  register: mysql_temp_password
+
+- name: check temporary password
+  fail: msg="cannot find temporary password"
+  when: mysql_temp_password.stdout | length() == 0
+
+- name: init ketadb mysql
+  shell: >-
+    /home/{{ketadb_user}}/mysql/bin/mysqld --defaults-file=/home/{{ketadb_user}}/mysql/my.cnf --daemonize && sleep 5 &&
+    /home/{{ketadb_user}}/mysql/bin/mysql -S /home/{{ketadb_user}}/mysql/mysql.sock -uroot -p"{{mysql_temp_password.stdout}}" --connect-expired-password -e "
+    alter user 'root'@'localhost' identified with mysql_native_password by '{{ketadb_mysql_password}}';
+    create user '{{ketadb_mysql_user}}'@'%' identified with mysql_native_password by '{{ketadb_mysql_password}}';
+    grant all privileges on *.* to '{{ketadb_mysql_user}}'@'%' with grant option;
+    flush privileges;" &&
+    cat /home/{{ketadb_user}}/mysql/mysql.pid | xargs kill
+
+- name: copy supervisor.conf
+  template:
+    src: supervisor.conf.j2
+    dest: "/home/{{ketadb_user}}/supervisor/conf.d/ketadb_mysql.conf"
+
+- name: Reread ketadb mysql
+  supervisorctl:
+    name: ketadb_mysql
+    state: present
+    config: /home/{{ketadb_user}}/supervisor/supervisord.conf
+    supervisorctl_path: /home/{{ketadb_user}}/.local/bin/supervisorctl
