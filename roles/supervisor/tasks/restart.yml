@@ -1,0 +1,5 @@
+- name: Restart supervisor
+  become: yes
+  systemd:
+    name: ksupervisord
+    state: restarted

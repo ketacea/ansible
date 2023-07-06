@@ -1,0 +1,18 @@
+# --------------- 所有节点公共配置 --------------
+ketadb_heap_size: "2g"
+
+ketadb_common_config:
+  cluster.name: "default"
+  network.host: "0.0.0.0"
+
+  # discovery.zen.ping.unicast.hosts: ["172.21.0.4:19201", "172.21.0.4:19202", "172.21.0.4:19203"]
+
+  keta.environment: "local"
+  keta.database.mysql.url: "172.10.0.1:3306"
+  keta.database.mysql.database: "ansible"
+  keta.database.mysql.user: "root"
+  keta.database.mysql.password: "654321"
+
+  path.data: ../var/data   # 数据持久化路径
+  path.logs: ../var/logs   # 日志持久化路径
+

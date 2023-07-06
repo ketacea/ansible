@@ -1,0 +1,13 @@
+ketadb_node_workspace: "/home/keta/node_01"
+
+ketadb_node_config:
+  node.name: "node_01"  # 节点名称
+
+  http.port: 19201           # http端口
+  transport.tcp.port: 19301  # tcp端口
+
+  node.master: "true" # 是否为master
+  node.web: "true"    # 是否为web
+  node.data: "false"   # 是否为data
+
+  node.tag: "hot"     # 冷热温配置：hot|warm|cold

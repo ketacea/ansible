@@ -1,0 +1,7 @@
+- name: Status ketadb - {{ketadb_node_config['node.name']}}
+  shell:
+    /home/{{ketadb_user}}/.local/bin/supervisorctl -c /home/{{ketadb_user}}/supervisor/supervisord.conf status ketadb_{{ketadb_node_config['node.name']}}
+  register: status_stdout
+
+- name: Show status
+  debug: msg="{{status_stdout['stdout_lines'][0]}}"

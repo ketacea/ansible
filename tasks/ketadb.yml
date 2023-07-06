@@ -1,0 +1,8 @@
+---
+- name: install ketadb for all nodes
+  hosts: master
+  user: "{{ketadb_user}}"
+  vars_files: 
+    - ../vars/ketadb.yml
+  roles:
+    - ketadb

@@ -1,0 +1,10 @@
+[program:ketadb_{{ketadb_node_config['node.name']}}]
+autorestart=True
+autostart=True
+redirect_stderr=True
+command={{ketadb_node_workspace}}/main/bin/keta
+user={{ketadb_user}}
+directory={{ketadb_node_workspace}}/main
+stdout_logfile_maxbytes = 50MB
+stdout_logfile_backups = 10
+stdout_logfile = /tmp/supervisor_ketadb_{{ketadb_node_config['node.name']}}.log

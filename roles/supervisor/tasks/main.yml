@@ -1,0 +1,31 @@
+- include_tasks:
+    file: install.yml
+    apply:
+      tags:
+        - install
+  tags:
+    - install
+
+- include_tasks:
+    file: start.yml
+    apply:
+      tags:
+        - start
+  tags:
+    - start
+
+- include_tasks:
+    file: restart.yml
+    apply:
+      tags:
+        - restart
+  tags:
+    - restart
+
+- include_tasks:
+    file: stop.yml
+    apply:
+      tags:
+        - stop
+  tags:
+    - stop

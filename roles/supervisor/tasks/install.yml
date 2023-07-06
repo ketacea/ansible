@@ -1,0 +1,66 @@
+- name: Fetch python2 stat
+  stat:
+    path: /usr/bin/python2
+  register: python2_stat
+
+- name: Ensure that python2 is installed
+  fail: msg="python2 is not installed"
+  when: not python2_stat.stat.exists
+
+- name: Fetch supervisor stat
+  stat:
+    path: /home/{{ketadb_user}}/.local/bin/supervisord
+  register: supervisor_stat
+
+- name: UnTar python2 library packages
+  unarchive:
+    src: "{{item}}.tar.gz"
+    dest: /tmp
+  loop:
+    - "setuptools-40.6.3"
+    - "meld3-1.0.2"
+    - "supervisor-3.3.3"
+  when: not supervisor_stat.stat.exists
+
+- name: Install python2 library packages
+  shell:
+    cd /tmp/{{item}} && /usr/bin/python2 setup.py install --user
+  loop:
+    - "setuptools-40.6.3"
+    - "meld3-1.0.2"
+    - "supervisor-3.3.3"
+  when: not supervisor_stat.stat.exists
+
+- name: Fetch supervisor stat
+  stat:
+    path: /home/{{ketadb_user}}/.local/bin/supervisord
+  register: supervisor_stat_new
+
+- name: Ensure that supervisor is installed
+  fail: msg="supervisor install failed"
+  when: not supervisor_stat_new.stat.exists
+
+- name: Ensure supervisor/conf.d exists
+  file:
+    path: "/home/{{ketadb_user}}/supervisor/conf.d"
+    state: directory
+    mode: 0755
+    owner: "{{ketadb_user}}"
+    recurse: yes
+
+- name: Copy supervisord.conf
+  template:
+    src: supervisord.conf.j2
+    dest: "/home/{{ketadb_user}}/supervisor/supervisord.conf"
+
+- name: Copy supervisord.service
+  become: yes
+  template:
+    src: supervisord.service.j2
+    dest: "/lib/systemd/system/ksupervisord.service"
+
+- name: Enable supervisord.service
+  become: yes
+  systemd:
+    name: ksupervisord
+    enabled: yes

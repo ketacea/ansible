@@ -1,0 +1,12 @@
+[Unit]
+Description=Keta Supervisord Service
+
+[Service]
+Restart=on-failure
+RestartSec=20s
+User={{ketadb_user}}
+ExecStart=/home/{{ketadb_user}}/.local/bin/supervisord -n -c /home/{{ketadb_user}}/supervisor/supervisord.conf
+
+[Install]
+WantedBy=multi-user.target
+Alias=ksupervisord.service
