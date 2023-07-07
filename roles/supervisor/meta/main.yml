@@ -1,0 +1,33 @@
+---
+dependencies: []
+
+galaxy_info:
+  role_name: supervisor
+  author: keta
+  description: Supervisor (process state manager) for KetaOps.
+  issue_tracker_url: https://e.gitee.com/xishuhq/repos/xishuhq/keta-ansible/sources
+  company: "KetaOps"
+  license: "Null"
+  min_ansible_version: 2.4
+  platforms:
+    - name: EL
+      versions:
+        - all
+    - name: Fedora
+      versions:
+        - all
+    - name: Debian
+      versions:
+        - all
+    - name: Ubuntu
+      versions:
+        - all
+  galaxy_tags:
+    - system
+    - server
+    - process
+    - supervisor
+    - supervisord
+    - manager
+    - init
+    - docker

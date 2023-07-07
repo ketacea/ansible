@@ -1,8 +1,0 @@
----
-- name: install supervisor for all nodes
-  hosts: supervisor
-  user: "{{ketadb_user}}"
-  vars_files:
-    - ../vars/ketadb.yml
-  roles:
-    - supervisor

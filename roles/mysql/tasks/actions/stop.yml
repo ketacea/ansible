@@ -1,0 +1,12 @@
+- name: Stop ketadb - mysql
+  supervisorctl:
+    name: "{{ mysql_supervisor_program }}"
+    state: stopped
+    config: "{{ supervisorctl_conf_path }}"
+    supervisorctl_path: "{{ supervisorctl_bin_path }}"
+
+- name: Wait for mysql stopping within 120s
+  wait_for:
+    port: "{{ mysql_run_port }}"
+    state: drained
+    timeout: 120

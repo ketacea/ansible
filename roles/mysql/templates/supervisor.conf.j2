@@ -1,10 +1,10 @@
-[program:ketadb_mysql]
+[program:{{ mysql_supervisor_program }}]
 autorestart=True
 autostart=True
 redirect_stderr=True
-command=/home/{{ketadb_user}}/mysql/bin/mysqld --defaults-file=/home/{{ketadb_user}}/mysql/my.cnf
-user={{ketadb_user}}
-directory=/home/{{ketadb_user}}/mysql
-stdout_logfile_maxbytes = 50MB
-stdout_logfile_backups = 10
-stdout_logfile = /tmp/supervisor_ketadb_mysql.log
+command={{ mysql_root_path }}/bin/mysqld --defaults-file={{ mysql_root_path }}/my.cnf
+user={{ mysql_run_user }}
+directory={{ mysql_root_path }}
+stdout_logfile_maxbytes={{ mysql_supervisor_logfile_maxbytes }}
+stdout_logfile_backups={{ mysql_supervisor_logfile_backups }}
+stdout_logfile={{ mysql_supervisor_logfile }}

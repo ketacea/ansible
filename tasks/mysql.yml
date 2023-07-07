@@ -1,8 +1,0 @@
----
-- name: install mysql
-  hosts: mysql
-  user: "{{ketadb_user}}"
-  vars_files: 
-    - ../vars/ketadb.yml
-  roles:
-    - mysql

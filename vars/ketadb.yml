@@ -1,9 +1,0 @@
-# 用户
-ketadb_user: keta
-
-# ketadb的安装包
-ketadb_version: v1.2.0
-ketadb_file: /tmp/keta-v1.2.0-apps.tar.gz
-
-# mysql的安装包
-ketadb_mysql_file: /tmp/mysql-8.0.33.tar.xz

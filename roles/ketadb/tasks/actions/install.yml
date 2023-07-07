@@ -1,0 +1,51 @@
+- name: Ensure ketadb packages and workspace directory exists
+  become: yes
+  file:
+    path: "{{ item }}"
+    state: directory
+    mode: 0755
+    owner: "{{ ketadb_run_user }}"
+    group: "{{ ketadb_run_user }}"
+    recurse: yes
+  loop:
+    - "{{ ketadb_root_path }}"
+    - "{{ ketadb_root_path }}/packages"
+    - "{{ ketadb_root_path }}/{{ ketadb_version }}"
+
+- name: Copy ketadb install file into tmp directory
+  copy:
+    src: "{{ ketadb_install_file }}"
+    dest: "/tmp/ketadb.install.file"
+
+- name: Unarchive ketadb install file to workspace
+  unarchive:
+    src: "/tmp/ketadb.install.file"
+    dest: "{{ ketadb_root_path }}/{{ ketadb_version }}"
+    extra_opts: "--strip-components=1"
+    remote_src: yes
+    creates: "{{ ketadb_root_path }}/{{ ketadb_version }}/keta_manifest"
+
+- name: Copy ketadb init file into place for ketadb
+  template:
+    src: keta.yml.j2
+    dest: "{{ ketadb_root_path }}/{{ ketadb_version }}/config/keta.yml"
+
+- name: Copy ketadb init file into place for jvm options
+  template:
+    src: jvm.options.j2
+    dest: "{{ ketadb_root_path }}/{{ ketadb_version }}/config/jvm.options"
+
+- name: Copy ketadb init file into place for supervisor program ketadb
+  template:
+    src: supervisor.conf.j2
+    dest: "/opt/ksupervisor/conf.d/{{ ketadb_supervisor_program }}.conf"
+
+- name: Replace current ketadb workspace
+  file:
+    src: "{{ ketadb_root_path }}/{{ ketadb_version }}"
+    dest: "{{ ketadb_root_path }}/keta"
+    state: link
+
+- name: Reread ketadb program
+  shell: >-
+    {{ supervisorctl_bin_path }} -c {{ supervisorctl_conf_path }} reread {{ ketadb_supervisor_program }}

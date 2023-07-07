@@ -1,5 +1,5 @@
 - include_tasks:
-    file: install.yml
+    file: actions/install.yml
     apply:
       tags:
         - install
@@ -7,15 +7,7 @@
     - install
 
 - include_tasks:
-    file: reread.yml
-    apply:
-      tags:
-        - reread
-  tags:
-    - reread
-
-- include_tasks:
-    file: start.yml
+    file: actions/start.yml
     apply:
       tags:
         - start
@@ -23,7 +15,7 @@
     - start
 
 - include_tasks:
-    file: restart.yml
+    file: actions/restart.yml
     apply:
       tags:
         - restart
@@ -31,7 +23,7 @@
     - restart
 
 - include_tasks:
-    file: status.yml
+    file: actions/status.yml
     apply:
       tags:
         - status
@@ -39,7 +31,7 @@
     - status
 
 - include_tasks:
-    file: stop.yml
+    file: actions/stop.yml
     apply:
       tags:
         - stop

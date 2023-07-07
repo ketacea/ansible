@@ -1,0 +1,38 @@
+---
+
+ketadb_version: v1.0.0
+ketadb_install_file: /tmp/ketadb-v1.0.0.tar.gz
+
+ketadb_run_user: keta
+ketadb_root_path: /opt/ketadb
+
+ketadb_supervisor_program: ketadb
+ketadb_supervisor_logfile: /tmp/supervisor-ketadb.log
+ketadb_supervisor_logfile_maxbytes: 50MB
+ketadb_supervisor_logfile_backups: 3
+
+ketadb_heap_size: 2g
+
+ketadb_config:
+  cluster.name: "default"
+
+ketadb_config_default:
+  cluster.name: "default"
+  network.host: "0.0.0.0"
+  http.port: 9200
+  transport.tcp.port: 9300
+
+  node.master: "true"
+  node.web: "true"
+  node.data: "true"
+
+  # discovery.zen.ping.unicast.hosts: []
+
+  keta.environment: "local"
+  keta.database.mysql.url: "127.0.0.1:3306"
+  keta.database.mysql.database: "ketadb"
+  keta.database.mysql.user: "keta"
+  keta.database.mysql.password: "123456"
+
+  path.data: "../var/data"
+  path.logs: "../var/logs"

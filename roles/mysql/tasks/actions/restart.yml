@@ -1,0 +1,11 @@
+- name: Restart mysql
+  supervisorctl:
+    name: "{{ mysql_supervisor_program }}"
+    state: restarted
+    config: "{{ supervisorctl_conf_path }}"
+    supervisorctl_path: "{{ supervisorctl_bin_path }}"
+
+- name: Wait for mysql restarting within 120s
+  wait_for:
+    port: "{{ mysql_run_port }}"
+    timeout: 120

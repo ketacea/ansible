@@ -1,0 +1,11 @@
+- name: Restart ketadb
+  supervisorctl:
+    name: "{{ ketadb_supervisor_program }}"
+    state: restarted
+    config: "{{ supervisorctl_conf_path }}"
+    supervisorctl_path: "{{ supervisorctl_bin_path }}"
+
+- name: Wait for ketadb restarting within 120s
+  wait_for:
+    port: "{{ ketadb_config_list['transport.tcp.port'] }}"
+    timeout: 120

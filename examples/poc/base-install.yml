@@ -1,0 +1,28 @@
+---
+- name: install supervisor for all nodes
+  hosts: supervisor
+  user: keta
+  tasks:
+    - name: install supervisor
+      include_role:
+        name: supervisor
+      tags:
+        - install
+
+- name: install mysql once
+  hosts: mysql
+  user: keta
+  vars:
+    mysql_install_file: /userdata/softs/code/mysql-8.0.32-linux-glibc2.17-x86_64-minimal.tar.xz
+    mysql_run_user: keta
+    mysql_run_pass: 123456
+    mysql_run_port: 13316
+    mysql_timezone: +08:00
+    mysql_character: utf8mb4
+    mysql_collation: utf8mb4_unicode_ci
+  tasks:
+    - name: install mysql
+      include_role:
+        name: mysql
+      tags:
+        - install

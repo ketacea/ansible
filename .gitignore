@@ -1,6 +1,9 @@
 .idea
 .ansible
+
+hosts.simple
+
 ansible.sh
 ansible-playbook.sh
 
-tasks/*.retry
+examples/**/*.retry

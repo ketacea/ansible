@@ -1,0 +1,7 @@
+- name: Fetch mysql program status
+  shell: >-
+    {{ supervisorctl_bin_path }} -c {{ supervisorctl_conf_path }} status {{ mysql_supervisor_program }}
+  register: mysql_program_status
+
+- name: Show mysql program status
+  debug: msg="{{ mysql_program_status.stdout }}"

@@ -1,0 +1,102 @@
+- name: Check if the path for supervisor program mysql exists
+  stat:
+    path: "/opt/ksupervisor/conf.d/{{ mysql_supervisor_program }}.conf"
+  register: mysql_supervisor_program_check
+
+- name: Stop supervisor program mysql
+  supervisorctl:
+    name: "{{ mysql_supervisor_program }}"
+    state: stopped
+    config: "{{ supervisorctl_conf_path }}"
+    supervisorctl_path: "{{ supervisorctl_bin_path }}"
+  when: mysql_supervisor_program_check.stat.exists
+
+- name: Ensure no mysql running
+  become: yes
+  shell: >-
+    ps -ef | grep -v grep | grep -w 'mysqld' | awk '{print $2}' | xargs kill -9 || echo 0
+
+- name: Delete mysql data and logs directory
+  become: yes
+  file:
+    path: "{{ item }}"
+    state: absent
+  loop:
+    - "{{ mysql_data_path }}"
+    - "{{ mysql_logs_path }}"
+
+- name: Ensure mysql data and logs directory exists
+  become: yes
+  file:
+    path: "{{ item }}"
+    state: directory
+    mode: 0755
+    owner: "{{ mysql_run_user }}"
+    group: "{{ mysql_run_user }}"
+    recurse: yes
+  loop:
+    - "{{ mysql_root_path }}"
+    - "{{ mysql_data_path }}"
+    - "{{ mysql_logs_path }}"
+
+- name: Copy mysql install file into tmp directory
+  copy:
+    src: "{{ mysql_install_file }}"
+    dest: "/tmp/ketadb-mysql.install.file"
+
+- name: Unarchive mysql install file to workspace
+  unarchive:
+    src: "/tmp/ketadb-mysql.install.file"
+    dest: "{{ mysql_root_path }}"
+    extra_opts: "--strip-components=1"
+    remote_src: yes
+    creates: "{{ mysql_root_path }}/bin/mysqld"
+
+- name: Copy mysql init file into place for mysqld
+  template:
+    src: my.cnf.j2
+    dest: "{{ mysql_root_path }}/my.cnf"
+
+- name: Fetch temporary password for init mysql
+  shell: >-
+    {{ mysql_root_path }}/bin/mysqld --defaults-file={{ mysql_root_path }}/my.cnf --initialize && 
+    cat {{ mysql_logs_path }}/error.log | grep 'temporary password' | awk '{print $NF}'
+  register: mysql_temporary_password
+
+- name: Check temporary password exists
+  fail: msg="Cannot find temporary password from log"
+  when: mysql_temporary_password.stdout | length() == 0
+
+- name: Init mysql and reset user
+  shell: >-
+    {{ mysql_root_path }}/bin/mysqld --defaults-file={{ mysql_root_path }}/my.cnf --daemonize && sleep 5 &&
+    {{ mysql_root_path }}/bin/mysql -S {{ mysql_root_path }}/mysql.sock -uroot -p"{{mysql_temporary_password.stdout}}" --connect-expired-password -e "
+    alter user 'root'@'localhost' identified with mysql_native_password by '{{ mysql_run_user }}';
+    create user '{{ mysql_run_user }}'@'%' identified with mysql_native_password by '{{ mysql_run_pass }}';
+    grant all privileges on *.* to '{{ mysql_run_user }}'@'%' with grant option;
+    flush privileges;" &&
+    cat {{ mysql_root_path }}/mysql.pid | xargs kill
+
+- name: Copy Supervisor init file into place for supervisor program mysql
+  template:
+    src: supervisor.conf.j2
+    dest: "/opt/ksupervisor/conf.d/{{ mysql_supervisor_program }}.conf"
+
+- name: Reread supervisor program mysql
+  supervisorctl:
+    name: "{{ mysql_supervisor_program }}"
+    state: present
+    config: "{{ supervisorctl_conf_path }}"
+    supervisorctl_path: "{{ supervisorctl_bin_path }}"
+
+- name: Start ketadb - mysql
+  supervisorctl:
+    name: "{{ mysql_supervisor_program }}"
+    state: started
+    config: "{{ supervisorctl_conf_path }}"
+    supervisorctl_path: "{{ supervisorctl_bin_path }}"
+
+- name: Wait for mysql starting within 120s
+  wait_for:
+    port: "{{ mysql_run_port }}"
+    timeout: 120

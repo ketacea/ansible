@@ -1,20 +1,20 @@
 [mysqld]
-basedir=/home/{{ketadb_user}}/mysql
-datadir={{ketadb_mysql_data_dir}}
-log-error=/home/{{ketadb_user}}/mysql/logs/error.log
-pid-file=/home/{{ketadb_user}}/mysql/mysql.pid
+basedir={{ mysql_root_path }}
+datadir={{ mysql_data_path }}
+log-error={{ mysql_logs_path }}/error.log
+pid-file={{ mysql_root_path }}/mysql.pid
 
-socket=/home/{{ketadb_user}}/mysql/mysql.sock
-port={{ketadb_mysql_port}}
+socket={{ mysql_root_path }}/mysql.sock
+port={{ mysql_run_port }}
 
-default-time-zone='{{ketadb_mysql_timezone}}'
+default-time-zone='{{ mysql_timezone }}'
 innodb_file_per_table=1
 default-storage-engine=innodb
-character_set_server=utf8mb4
-collation-server=utf8mb4_unicode_ci
+character_set_server={{ mysql_character }}
+collation-server={{ mysql_collation }}
 
 [mysql]
-default-character-set=utf8mb4
+default-character-set={{ mysql_character }}
 
 [client]
-default-character-set=utf8mb4
+default-character-set={{ mysql_character }}

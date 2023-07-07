@@ -1,0 +1,7 @@
+- name: Fetch ketadb program status
+  shell: >-
+    {{ supervisorctl_bin_path }} -c {{ supervisorctl_conf_path }} status {{ ketadb_supervisor_program }}
+  register: ketadb_program_status
+
+- name: Show ketadb program status
+  debug: msg="{{ ketadb_program_status.stdout }}"

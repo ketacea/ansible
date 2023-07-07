@@ -1,7 +1,3 @@
-{% for key in ketadb_common_config %}
-{{key}}: {{ketadb_common_config[key]}}
-{% endfor %}
-
-{% for key in ketadb_node_config %}
-{{key}}: {{ketadb_node_config[key]}}
+{% for key in ketadb_config_list %}
+{{key}}: {{ketadb_config_list[key] | to_json }}
 {% endfor %}
