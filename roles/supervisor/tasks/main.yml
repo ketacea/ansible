@@ -23,6 +23,14 @@
     - restart
 
 - include_tasks:
+    file: actions/status.yml
+    apply:
+      tags:
+        - status
+  tags:
+    - status
+
+- include_tasks:
     file: actions/stop.yml
     apply:
       tags:

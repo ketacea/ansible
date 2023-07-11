@@ -5,7 +5,7 @@ Description=Keta Supervisord Service
 Restart=on-failure
 RestartSec=20s
 User={{ supervisor_run_user }}
-ExecStart=/home/{{ supervisor_run_user }}/.local/bin/supervisord -n -c /opt/ksupervisor/supervisor.conf
+ExecStart={{ supervisor_bin_path }}/supervisord -n -c {{ supervisor_conf_path }}
 
 [Install]
 WantedBy=multi-user.target

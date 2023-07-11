@@ -9,7 +9,7 @@
 
 - name: Check if the path for Supervisor exists
   stat:
-    path: /home/{{ supervisor_run_user }}/.local/bin/supervisord
+    path: "{{ supervisor_bin_path }}/supervisord"
   register: supervisor_check
 
 - name: Unarchive for installing supervisor
@@ -42,7 +42,7 @@
   become: yes
   template:
     src: supervisor.conf.j2
-    dest: "/opt/ksupervisor/supervisor.conf"
+    dest: "{{ supervisor_conf_path }}"
 
 - name: Copy Supervisor init file into place for systemd
   become: yes

@@ -1,0 +1,14 @@
+---
+- name: supervisor manager
+  hosts: supervisor
+  user: keta
+  tasks:
+    - name: supervisor
+      include_role:
+        name: supervisor
+      tags:
+        - install
+        - restart
+        - start
+        - stop
+        - status

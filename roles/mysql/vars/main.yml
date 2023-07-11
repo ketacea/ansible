@@ -1,4 +1,4 @@
 ---
 
-supervisorctl_bin_path: /home/{{ mysql_run_user }}/.local/bin/supervisorctl
-supervisorctl_conf_path: /opt/ksupervisor/supervisor.conf
+supervisor_bin_path: /home/{{ mysql_run_user }}/.local/bin
+supervisor_conf_path: /opt/ksupervisor/supervisor.conf

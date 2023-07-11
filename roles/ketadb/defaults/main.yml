@@ -1,7 +1,7 @@
 ---
 
-ketadb_version: v1.0.0
-ketadb_install_file: /tmp/ketadb-v1.0.0.tar.gz
+ketadb_version: latest
+ketadb_install_file: /tmp/ketadb.tar.gz
 
 ketadb_run_user: keta
 ketadb_root_path: /opt/ketadb

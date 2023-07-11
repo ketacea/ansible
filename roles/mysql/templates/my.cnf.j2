@@ -10,6 +10,7 @@ port={{ mysql_run_port }}
 default-time-zone='{{ mysql_timezone }}'
 innodb_file_per_table=1
 default-storage-engine=innodb
+max_allowed_packet=4096M
 character_set_server={{ mysql_character }}
 collation-server={{ mysql_collation }}
 

@@ -1,18 +1,17 @@
 [all]
-myhost ansible_host=127.0.0.1 ansible_ssh_private_key_file=~/.ssh/id_rsa
-; myhost ansible_ssh_host=172.10.0.11 ansible_ssh_user=keta ansible_ssh_pass=123456
+keta_host_10    ansible_ssh_host=172.10.0.10 ansible_ssh_user=keta ansible_ssh_pass=123456
 
 [supervisor]
-myhost
+keta_host_10
 
 [mysql]
-myhost
+keta_host_10
 
 [master]
-myhost
+keta_host_10
 
 [web]
-myhost
+keta_host_10
 
 [data]
-myhost
+keta_host_10

@@ -2,8 +2,8 @@
   supervisorctl:
     name: "{{ mysql_supervisor_program }}"
     state: started
-    config: "{{ supervisorctl_conf_path }}"
-    supervisorctl_path: "{{ supervisorctl_bin_path }}"
+    config: "{{ supervisor_conf_path }}"
+    supervisorctl_path: "{{ supervisor_bin_path }}/supervisorctl"
 
 - name: Wait for mysql starting within 120s
   wait_for:

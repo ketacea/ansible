@@ -1,0 +1,38 @@
+- name: ketadb manager
+  hosts: master
+  user: keta
+  vars:
+    ketadb_run_user: keta
+    ketadb_version: v1.2.2.1
+    ketadb_install_file: /tmp/keta-v1.2.2.1-apps.tar.gz
+
+    ketadb_heap_size: 2g
+    ketadb_root_path: /opt/ketadb
+    ketadb_supervisor_program: ketadb
+    ketadb_supervisor_logfile: /tmp/supervisor-ketadb.log
+    ketadb_config:
+      http.port: 9200
+      transport.tcp.port: 9300
+
+      node.master: "true"
+      node.web: "true"
+      node.data: "true"
+
+      keta.environment: "local"
+      keta.database.mysql.url: "127.0.0.1:3306"
+      keta.database.mysql.database: "ketadb"
+      keta.database.mysql.user: "keta"
+      keta.database.mysql.password: "123456"
+
+      path.data: "../var/data"
+      path.logs: "../var/logs"
+  tasks:
+    - name: install ketadb
+      include_role:
+        name: ketadb
+      tags:
+        - install
+        - restart
+        - start
+        - status
+        - stop

@@ -46,6 +46,14 @@
     dest: "{{ ketadb_root_path }}/keta"
     state: link
 
-- name: Reread ketadb program
-  shell: >-
-    {{ supervisorctl_bin_path }} -c {{ supervisorctl_conf_path }} reread {{ ketadb_supervisor_program }}
+- name: Reread ketadb
+  supervisorctl:
+    name: "{{ ketadb_supervisor_program }}"
+    state: present
+    config: "{{ supervisor_conf_path }}"
+    supervisorctl_path: "{{ supervisor_bin_path }}/supervisorctl"
+
+- name: Wait for ketadb starting within 120s
+  wait_for:
+    port: "{{ ketadb_config_list['transport.tcp.port'] }}"
+    timeout: 120

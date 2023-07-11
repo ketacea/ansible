@@ -7,8 +7,8 @@
   supervisorctl:
     name: "{{ mysql_supervisor_program }}"
     state: stopped
-    config: "{{ supervisorctl_conf_path }}"
-    supervisorctl_path: "{{ supervisorctl_bin_path }}"
+    config: "{{ supervisor_conf_path }}"
+    supervisorctl_path: "{{ supervisor_bin_path }}/supervisorctl"
   when: mysql_supervisor_program_check.stat.exists
 
 - name: Ensure no mysql running
@@ -86,15 +86,15 @@
   supervisorctl:
     name: "{{ mysql_supervisor_program }}"
     state: present
-    config: "{{ supervisorctl_conf_path }}"
-    supervisorctl_path: "{{ supervisorctl_bin_path }}"
+    config: "{{ supervisor_conf_path }}"
+    supervisorctl_path: "{{ supervisor_bin_path }}/supervisorctl"
 
 - name: Start ketadb - mysql
   supervisorctl:
     name: "{{ mysql_supervisor_program }}"
     state: started
-    config: "{{ supervisorctl_conf_path }}"
-    supervisorctl_path: "{{ supervisorctl_bin_path }}"
+    config: "{{ supervisor_conf_path }}"
+    supervisorctl_path: "{{ supervisor_bin_path }}/supervisorctl"
 
 - name: Wait for mysql starting within 120s
   wait_for:
