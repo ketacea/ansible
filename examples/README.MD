@@ -5,15 +5,18 @@
 ### Supervisor
 
 ```shell
-./ansible-playbook.sh examples/poc/supervisor.yml -t install -K
+./ansible-playbook.sh examples/poc/supervisor.yml -K -t install
+./ansible-playbook.sh examples/poc/supervisor.yml -K -t config
+./ansible-playbook.sh examples/poc/supervisor.yml -K -t start
 
 # 说明, -K 表示目标主机在执行shell命令时，有些命令是以sudo执行的，所以要输入当前用户的密码，默认为123456，切换到sudo权限
 
-# 重启、停止
-./ansible-playbook.sh examples/poc/supervisor.yml -t restart -K
-./ansible-playbook.sh examples/poc/supervisor.yml -t start -K
-./ansible-playbook.sh examples/poc/supervisor.yml -t status
-./ansible-playbook.sh examples/poc/supervisor.yml -t stop -K
+# 重启、停止、卸载
+./ansible-playbook.sh examples/poc/supervisor.yml -K -t restart
+./ansible-playbook.sh examples/poc/supervisor.yml -K -t start
+./ansible-playbook.sh examples/poc/supervisor.yml -K -t status
+./ansible-playbook.sh examples/poc/supervisor.yml -K -t stop
+./ansible-playbook.sh examples/poc/supervisor.yml -K -t uninstall
 ```
 
 ### MySQL
@@ -23,13 +26,16 @@ wget https://dev.mysql.com/get/Downloads/MySQL-8.0/mysql-8.0.33-linux-glibc2.17-
 ```
 
 ```shell
-./ansible-playbook.sh examples/poc/mysql.yml -t install -K
+./ansible-playbook.sh examples/poc/mysql.yml -K -t install
+./ansible-playbook.sh examples/poc/mysql.yml -K -t config
+./ansible-playbook.sh examples/poc/mysql.yml -K -t start
 
-# 重启、停止
-./ansible-playbook.sh examples/poc/mysql.yml -t restart
-./ansible-playbook.sh examples/poc/mysql.yml -t start
-./ansible-playbook.sh examples/poc/mysql.yml -t status
-./ansible-playbook.sh examples/poc/mysql.yml -t stop
+# 重启、停止、状态、卸载
+./ansible-playbook.sh examples/poc/mysql.yml -K -t restart
+./ansible-playbook.sh examples/poc/mysql.yml -K -t start
+./ansible-playbook.sh examples/poc/mysql.yml -K -t status
+./ansible-playbook.sh examples/poc/mysql.yml -K -t stop
+./ansible-playbook.sh examples/poc/mysql.yml -K -t uninstall
 ```
 
 ### KetaDB
@@ -44,24 +50,30 @@ wget https://phoenix-public-1312700048.cos.ap-shanghai.myqcloud.com/ketadb-relea
 
 ```shell
 # 三节点部署
-./ansible-playbook.sh examples/poc/ketadb.yml -t install -K
+./ansible-playbook.sh examples/poc/ketadb.yml -K -t install
+./ansible-playbook.sh examples/poc/ketadb.yml -K -t config
+./ansible-playbook.sh examples/poc/ketadb.yml -K -t start
 
-# 重启、停止、状态
-./ansible-playbook.sh examples/poc/ketadb.yml -t restart
-./ansible-playbook.sh examples/poc/ketadb.yml -t start
-./ansible-playbook.sh examples/poc/ketadb.yml -t status
-./ansible-playbook.sh examples/poc/ketadb.yml -t stop
+# 重启、停止、状态、卸载
+./ansible-playbook.sh examples/poc/ketadb.yml -K -t restart
+./ansible-playbook.sh examples/poc/ketadb.yml -K -t start
+./ansible-playbook.sh examples/poc/ketadb.yml -K -t status
+./ansible-playbook.sh examples/poc/ketadb.yml -K -t stop
+./ansible-playbook.sh examples/poc/ketadb.yml -K -t uninstall
 ```
 
 + 单节点集群 - 安装、加载、启动
 
 ```shell
 # 单节点部署
-./ansible-playbook.sh examples/poc/ketadb-single.yml -t install -K
+./ansible-playbook.sh examples/poc/ketadb-single.yml -K -t install
+./ansible-playbook.sh examples/poc/ketadb-single.yml -K -t config
+./ansible-playbook.sh examples/poc/ketadb-single.yml -K -t start
 
-# 重启、停止、状态
-./ansible-playbook.sh examples/poc/ketadb-single.yml -t restart
-./ansible-playbook.sh examples/poc/ketadb-single.yml -t start
-./ansible-playbook.sh examples/poc/ketadb-single.yml -t status
-./ansible-playbook.sh examples/poc/ketadb-single.yml -t stop
+# 重启、停止、状态、卸载
+./ansible-playbook.sh examples/poc/ketadb-single.yml -K -t restart
+./ansible-playbook.sh examples/poc/ketadb-single.yml -K -t start
+./ansible-playbook.sh examples/poc/ketadb-single.yml -K -t status
+./ansible-playbook.sh examples/poc/ketadb-single.yml -K -t stop
+./ansible-playbook.sh examples/poc/ketadb-single.yml -K -t uninstall
 ```

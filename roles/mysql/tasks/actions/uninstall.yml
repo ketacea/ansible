@@ -1,0 +1,30 @@
+- name: Check if mysql is installed
+  stat:
+    path: "{{ mysql_root_path }}/install.tag"
+  register: mysql_install_check
+
+- name: Stop supervisor program mysql
+  supervisorctl:
+    name: "{{ mysql_supervisor_program }}"
+    state: stopped
+    config: "{{ supervisor_conf_path }}"
+    supervisorctl_path: "{{ supervisor_bin_path }}/supervisorctl"
+  when: mysql_install_check.stat.exists
+
+- name: Remove mysql from supervisor
+  shell: >-
+    {{ supervisor_bin_path }}/supervisorctl -c {{ supervisor_conf_path }} remove {{ mysql_supervisor_program }}
+
+- name: Ensure no mysql running
+  become: yes
+  shell: >-
+    ps -ef | grep -v grep | grep -w 'mysqld' | awk '{print $2}' | xargs kill -9 || echo 0
+
+- name: Delete mysql files
+  become: yes
+  file:
+    path: "{{ item }}"
+    state: absent
+  loop:
+    - "{{ mysql_root_path }}"
+    - "/opt/ksupervisor/conf.d/{{ mysql_supervisor_program }}.conf"

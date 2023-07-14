@@ -1,15 +1,11 @@
-- name: Check if the path for supervisor program mysql exists
+- name: Check if mysql is installed
   stat:
-    path: "/opt/ksupervisor/conf.d/{{ mysql_supervisor_program }}.conf"
-  register: mysql_supervisor_program_check
+    path: "{{ mysql_root_path }}/install.tag"
+  register: mysql_install_check
 
-- name: Stop supervisor program mysql
-  supervisorctl:
-    name: "{{ mysql_supervisor_program }}"
-    state: stopped
-    config: "{{ supervisor_conf_path }}"
-    supervisorctl_path: "{{ supervisor_bin_path }}/supervisorctl"
-  when: mysql_supervisor_program_check.stat.exists
+- name: Ensure mysql uninstall before install
+  fail: msg="You must uninstall it before install."
+  when: mysql_install_check.stat.exists
 
 - name: Ensure no mysql running
   become: yes
@@ -52,51 +48,7 @@
     remote_src: yes
     creates: "{{ mysql_root_path }}/bin/mysqld"
 
-- name: Copy mysql init file into place for mysqld
-  template:
-    src: my.cnf.j2
-    dest: "{{ mysql_root_path }}/my.cnf"
-
-- name: Fetch temporary password for init mysql
-  shell: >-
-    {{ mysql_root_path }}/bin/mysqld --defaults-file={{ mysql_root_path }}/my.cnf --initialize && 
-    cat {{ mysql_logs_path }}/error.log | grep 'temporary password' | awk '{print $NF}'
-  register: mysql_temporary_password
-
-- name: Check temporary password exists
-  fail: msg="Cannot find temporary password from log"
-  when: mysql_temporary_password.stdout | length() == 0
-
-- name: Init mysql and reset user
-  shell: >-
-    {{ mysql_root_path }}/bin/mysqld --defaults-file={{ mysql_root_path }}/my.cnf --daemonize && sleep 5 &&
-    {{ mysql_root_path }}/bin/mysql -S {{ mysql_root_path }}/mysql.sock -uroot -p"{{mysql_temporary_password.stdout}}" --connect-expired-password -e "
-    alter user 'root'@'localhost' identified with mysql_native_password by '{{ mysql_run_user }}';
-    create user '{{ mysql_run_user }}'@'%' identified with mysql_native_password by '{{ mysql_run_pass }}';
-    grant all privileges on *.* to '{{ mysql_run_user }}'@'%' with grant option;
-    flush privileges;" &&
-    cat {{ mysql_root_path }}/mysql.pid | xargs kill
-
-- name: Copy Supervisor init file into place for supervisor program mysql
-  template:
-    src: supervisor.conf.j2
-    dest: "/opt/ksupervisor/conf.d/{{ mysql_supervisor_program }}.conf"
-
-- name: Reread supervisor program mysql
-  supervisorctl:
-    name: "{{ mysql_supervisor_program }}"
-    state: present
-    config: "{{ supervisor_conf_path }}"
-    supervisorctl_path: "{{ supervisor_bin_path }}/supervisorctl"
-
-- name: Start ketadb - mysql
-  supervisorctl:
-    name: "{{ mysql_supervisor_program }}"
-    state: started
-    config: "{{ supervisor_conf_path }}"
-    supervisorctl_path: "{{ supervisor_bin_path }}/supervisorctl"
-
-- name: Wait for mysql starting within 120s
-  wait_for:
-    port: "{{ mysql_run_port }}"
-    timeout: 120
+- name: Touch the tag file for checking installed
+  file:
+    path: "{{ mysql_root_path }}/install.tag"
+    state: touch

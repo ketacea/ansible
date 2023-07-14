@@ -37,10 +37,12 @@
         name: ketadb
       tags:
         - install
+        - config
         - restart
         - start
         - status
         - stop
+        - uninstall
 
 - name: install web ketadb
   hosts: web
@@ -81,10 +83,12 @@
         name: ketadb
       tags:
         - install
+        - config
         - restart
         - start
         - status
         - stop
+        - uninstall
 
 - name: install data ketadb
   hosts: data
@@ -125,7 +129,9 @@
         name: ketadb
       tags:
         - install
+        - config
         - restart
         - start
         - status
         - stop
+        - uninstall

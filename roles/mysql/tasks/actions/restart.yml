@@ -1,3 +1,6 @@
+- include_tasks:
+    file: check.yml
+
 - name: Restart mysql
   supervisorctl:
     name: "{{ mysql_supervisor_program }}"

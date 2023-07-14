@@ -7,6 +7,14 @@
     - install
 
 - include_tasks:
+    file: actions/config.yml
+    apply:
+      tags:
+        - config
+  tags:
+    - config
+
+- include_tasks:
     file: actions/start.yml
     apply:
       tags:
@@ -37,3 +45,11 @@
         - stop
   tags:
     - stop
+
+- include_tasks:
+    file: actions/uninstall.yml
+    apply:
+      tags:
+        - uninstall
+  tags:
+    - uninstall

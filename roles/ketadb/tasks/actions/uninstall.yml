@@ -1,0 +1,25 @@
+- name: Check if ketadb is installed
+  stat:
+    path: "{{ ketadb_root_path }}"
+  register: ketadb_install_check
+
+- name: Stop ketadb
+  supervisorctl:
+    name: "{{ ketadb_supervisor_program }}"
+    state: stopped
+    config: "{{ supervisor_conf_path }}"
+    supervisorctl_path: "{{ supervisor_bin_path }}/supervisorctl"
+  when: ketadb_install_check.stat.exists
+
+- name: Remove ketadb from supervisor
+  shell: >-
+    {{ supervisor_bin_path }}/supervisorctl -c {{ supervisor_conf_path }} remove {{ ketadb_supervisor_program }}
+
+- name: Delete ketadb files
+  become: yes
+  file:
+    path: "{{ item }}"
+    state: absent
+  loop:
+    - "{{ ketadb_root_path }}"
+    - "/opt/ksupervisor/conf.d/{{ ketadb_supervisor_program }}.conf"

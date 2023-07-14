@@ -15,7 +15,9 @@
         name: mysql
       tags:
         - install
+        - config
         - restart
         - start
-        - status
         - stop
+        - status
+        - uninstall

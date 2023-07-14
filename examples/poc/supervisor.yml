@@ -8,7 +8,9 @@
         name: supervisor
       tags:
         - install
+        - config
         - restart
         - start
         - stop
         - status
+        - uninstall

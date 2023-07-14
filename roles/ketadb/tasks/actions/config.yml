@@ -1,0 +1,23 @@
+- name: Check if ketadb is installed
+  stat:
+    path: "{{ ketadb_root_path }}/{{ ketadb_version }}/install.tag"
+  register: ketadb_install_check
+
+- name: Ensure ketadb installed
+  fail: msg="Ketadb is not installed."
+  when: not ketadb_install_check.stat.exists
+
+- name: Copy ketadb init file into place for ketadb
+  template:
+    src: keta.yml.j2
+    dest: "{{ ketadb_root_path }}/{{ ketadb_version }}/config/keta.yml"
+
+- name: Copy ketadb init file into place for jvm options
+  template:
+    src: jvm.options.j2
+    dest: "{{ ketadb_root_path }}/{{ ketadb_version }}/config/jvm.options"
+
+- name: Touch the tag file for checking the config changed
+  file:
+    path: "{{ ketadb_root_path }}/{{ ketadb_version }}/config.tag"
+    state: touch

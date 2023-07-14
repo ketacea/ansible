@@ -1,0 +1,26 @@
+- name: Check if the path for Supervisor exists
+  stat:
+    path: "{{ supervisor_bin_path }}/supervisord"
+  register: supervisor_check
+
+- name: Stop supervisor
+  become: yes
+  systemd:
+    name: ksupervisord
+    state: stopped
+  when: supervisor_check.stat.exists
+
+- name: Ensure Supervisor is disabled at boot.
+  become: yes
+  systemd:
+    name: ksupervisord
+    enabled: no
+
+- name: Remove /opt/ksupervisor directory
+  become: yes
+  file:
+    path: "{{ item }}"
+    state: absent
+  loop:
+    - "/opt/ksupervisor"
+    - "/lib/systemd/system/ksupervisord.service"

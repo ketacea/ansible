@@ -1,4 +1,7 @@
-- name: Start ketadb - mysql
+- include_tasks:
+    file: check.yml
+
+- name: Start mysql
   supervisorctl:
     name: "{{ mysql_supervisor_program }}"
     state: started

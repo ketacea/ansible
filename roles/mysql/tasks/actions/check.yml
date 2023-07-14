@@ -1,0 +1,26 @@
+- name: Check if config is updated
+  stat:
+    path: "{{ mysql_root_path }}/config.tag"
+  register: mysql_config_check
+
+- name: Copy Supervisor init file into place for supervisor program mysql
+  template:
+    src: supervisor.conf.j2
+    dest: "/opt/ksupervisor/conf.d/{{ mysql_supervisor_program }}.conf"
+  when: mysql_config_check.stat.exists
+
+- name: Reread supervisor program mysql
+  supervisorctl:
+    name: "{{ mysql_supervisor_program }}"
+    state: present
+    config: "{{ supervisor_conf_path }}"
+    supervisorctl_path: "{{ supervisor_bin_path }}/supervisorctl"
+  when: mysql_config_check.stat.exists
+
+- name: Delete mysql config update tag
+  file:
+    path: "{{ item }}"
+    state: absent
+  loop:
+    - "{{ mysql_root_path }}/config.tag"
+  when: mysql_config_check.stat.exists

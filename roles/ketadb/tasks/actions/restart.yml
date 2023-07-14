@@ -1,3 +1,6 @@
+- include_tasks:
+    file: check.yml
+
 - name: Restart ketadb
   supervisorctl:
     name: "{{ ketadb_supervisor_program }}"

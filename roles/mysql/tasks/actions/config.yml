@@ -1,0 +1,36 @@
+- name: Copy mysql init file into place for mysqld
+  template:
+    src: my.cnf.j2
+    dest: "{{ mysql_root_path }}/my.cnf"
+
+- name: Check if install for the first time
+  stat:
+    path: "{{ mysql_logs_path }}/error.log"
+  register: mysql_first_check
+
+- name: Fetch temporary password for init mysql
+  shell: >-
+    {{ mysql_root_path }}/bin/mysqld --defaults-file={{ mysql_root_path }}/my.cnf --initialize && 
+    cat {{ mysql_logs_path }}/error.log | grep 'temporary password' | awk '{print $NF}'
+  register: mysql_temporary_password
+  when: not mysql_first_check.stat.exists
+
+- name: Check temporary password exists
+  fail: msg="Cannot find temporary password from log"
+  when: not mysql_first_check.stat.exists and mysql_temporary_password.stdout | length() == 0
+
+- name: Init mysql and reset user
+  shell: >-
+    {{ mysql_root_path }}/bin/mysqld --defaults-file={{ mysql_root_path }}/my.cnf --daemonize && sleep 5 &&
+    {{ mysql_root_path }}/bin/mysql -S {{ mysql_root_path }}/mysql.sock -uroot -p"{{mysql_temporary_password.stdout}}" --connect-expired-password -e "
+    alter user 'root'@'localhost' identified with mysql_native_password by '{{ mysql_run_user }}';
+    create user '{{ mysql_run_user }}'@'%' identified with mysql_native_password by '{{ mysql_run_pass }}';
+    grant all privileges on *.* to '{{ mysql_run_user }}'@'%' with grant option;
+    flush privileges;" &&
+    cat {{ mysql_root_path }}/mysql.pid | xargs kill
+  when: not mysql_first_check.stat.exists
+
+- name: Touch the tag file for checking the config changed
+  file:
+    path: "{{ mysql_root_path }}/config.tag"
+    state: touch
