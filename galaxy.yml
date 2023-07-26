@@ -1,0 +1,17 @@
+---
+namespace: ketaops
+name: platform
+version: 1.2.3
+readme: README.md
+authors:
+  - ketaops ansible team
+description: KetaOps Platform Ansible Collection (https://github.com/confluentinc/cp-ansible)
+license_file: LICENSE.md
+tags:
+  - ketaops
+  - application
+dependencies: {}
+repository: https://github.com/ketaops/ansible
+documentation: https://github.com/ketaops/ansible
+homepage: https://github.com/ketaops/ansible
+issues: https://github.com/ketaops/ansible/issues

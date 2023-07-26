@@ -1,7 +1,115 @@
-# 自动化部署
+# introduction
 
-## 介绍
-本项目，用于快速部署和管理ketadb平台
+Ansible provides a simple way to deploy, manage and configure the ketaops platform. Specifically this repository:
+
+- Installs KetaOps Platform packages
+- Starts services using supervisor
+- Provides configuration options 
+
+the services that can be installed from this repository are:
+
+- supervisor - like systemd,daemon mysql, ketadb etc
+- mysql - meta database
+- ketadb - the observability backend, frontend and database
+
+You can find supported configuration variables in
+
+- [common variables](common_variables.md)
+- [supervisor variables](roles/supervisor/README.md)
+- [mysql variables](roles/mysql/README.md)
+- [ketadb variables](roles/ketadb/README.md)
+
+# Installation
+Deploy KetaOps Platform in 3 steps with the Ansible Installer
+
+#### Requirement
+1. The ability to reach ketaops's software package repository at phoenix-public-1312700048.cos.ap-shanghai.myqcloud.com
+2. At least 2 vCPUs, 8GB of RAM, and 8GB of storage.
+3. RHEL/CentOS 7.x, RHEL/CentOS 8.x, Debian 9, Ubuntu 16.04 LTS, or Ubuntu 18.04 LTS operating system.
+4. Installed Software
+    - Check that Python 3 is installed by running the following:
+      - ```python --version```
+    - Check that SSH is installed by running the following:
+      - ```ssh -V```
+    - Check that Ansible v2.11+ is installed by running the following:
+        - ```ansible --version```
+
+#### Machine
+
+Get machine list:
+- 192.168.1.1
+- 192.168.1.2
+- 192.168.1.3
+
+install ketaops service
+- Tree supervisor instance on 
+  - 192.168.1.1
+  - 192.168.1.2
+  - 192.168.1.3
+- A mysql instance on 
+  - 192.168.1.1
+- Tree ketadb instance on
+  - 192.168.1.1
+  - 192.168.1.2
+  - 192.168.1.3
+
+#### Download && Install
+- Run the following command to download the Keta Ansible Playbook:
+```
+ansible-galaxy collection install git+https://gitee.com/xishuhq/keta-ansible.git
+```
+```
+git clone git@gitee.com:xishuhq/keta-ansible.git
+ansible-galaxy collection install --force ./keta-ansible
+```
+
+- Copy the following into a file called ansible.cfg that can be saved in the current directory
+```ini
+[defaults]
+hash_behaviour=merge
+```
+
+- Copy the following into a file called hosts.yml that can be saved in the current directory
+```yaml
+all:
+  vars:
+    ansible_ssh_user: keta
+    ansible_ssh_pass: 123456
+  children:
+    supervisor:
+      hosts:
+        supervisor-1: { ansible_ssh_host: 192.168.1.1 }
+        supervisor-2: { ansible_ssh_host: 192.168.1.2 }
+        supervisor-3: { ansible_ssh_host: 192.168.1.3 }
+    mysql:
+      hosts:
+        mysql: { ansible_ssh_host: 192.168.1.1 }
+    keta:
+      vars:
+        version: v1.2.2.1
+      hosts:
+        keta-1: { ansible_ssh_host: 192.168.1.1 }
+        keta-2: { ansible_ssh_host: 192.168.1.2 }
+        keta-3: { ansible_ssh_host: 192.168.1.3 }
+```
+- Run the following command:
+
+```ansible-playbook -i hosts.yml ketaops.platform.all```
+## 目录结构
+
+| 路径                     | 介绍   |
+|------------------------|------|
+| `/opt/ketaops/lib`     | 应用程序 |
+| `/opt/ketaops/etc`     | 配置文件 |
+| `/opt/ketaops/log`     | 日志   |
+| `/opt/ketaops/var`     | 数据   |
+| `/opt/ketaops/package` | 安装包  |
+
+## 各组件版本兼容列表
+
+| ketadb   | mysql  | supervisor |
+|----------|--------|------------|
+| v1.2.2.1 | 8.0.33 | -          |
 
 ## 准备环境
 
@@ -27,81 +135,3 @@ make ansible-mac-install
 ## Poc部署
 
 POC环境，详细文档：[POC文档](examples/README.MD)
-
-## Role说明
-
-### supervisor
-
-该角色用于安装和管理supervisor，自定义变量如下：
-
-| 参数名                         | 默认值                              | 描述                  |
-|-----------------------------|----------------------------------|---------------------|
-| supervisor_run_user         | keta                             | supervisor执行的用户     |
-| supervisor_bin_path         | ~/.local/bin                     | supervisor可执行程序的路径  |
-| supervisor_conf_path        | /opt/ksupervisor/supervisor.conf | supervisor的配置文件路径   |
-| supervisor_sockfile         | /opt/ksupervisor/supervisor.sock | supervisor的sock文件路径 |
-| supervisor_pidfile          | /opt/ksupervisor/supervisor.pid  | supervisor的pid文件路径  |
-| supervisor_logfile          | /opt/ksupervisor/supervisor.log  | supervisor的log文件路径  |
-| supervisor_logfile_maxbytes | 50MB                             | supervisor的log最大字节数 |
-| supervisor_logfile_backups  | 3                                | supervisor的log备份数量  |
-| supervisor_loglevel         | info                             | supervisor的log记录级别  |
-
-### mysql
-
-该角色用于安装和管理mysql，自定义变量如下：
-
-| 参数名                               | 默认值                              | 描述                     |
-|-----------------------------------|----------------------------------|------------------------|
-| mysql_install_file                | /tmp/mysql-8.0.33.tar.xz         | mysql的安装文件路径           |
-| mysql_run_user                    | keta                             | mysql的用户               |
-| mysql_run_pass                    | 123456                           | mysql的密码               |
-| mysql_run_port                    | 3306                             | mysql的端口               |
-| mysql_root_path                   | /opt/mysql                       | mysql的安装路径             |
-| mysql_data_path                   | /opt/mysql/data                  | mysql的data目录           |
-| mysql_logs_path                   | /opt/mysql/logs                  | mysql的logs目录           |
-| mysql_timezone                    | +08:00                           | mysql的时区选择             |
-| mysql_character                   | utf8mb4                          | mysql的编码               |
-| mysql_collation                   | utf8mb4_unicode_ci               | mysql的编码               |
-| mysql_supervisor_program          | keta-mysql                       | mysql的supervisor程序名    |
-| mysql_supervisor_logfile          | /tmp/supervisor-keta-mysql.log   | mysql的supervisor日志路径   |
-| mysql_supervisor_logfile_maxbytes | 50MB                             | mysql的supervisor日志最大字节 |
-| mysql_supervisor_logfile_backups  | 3                                | mysql的supervisor日志备份数量 |
-| supervisor_bin_path               | ~/.local/bin                     | supervisor的bin路径       |
-| supervisor_conf_path              | /opt/ksupervisor/supervisor.conf | supervisor的配置          |
-
-### ketadb
-
-该角色用于安装和管理ketadb，自定义变量如下：
-
-| 参数名                                | 默认值                        | 描述                      |
-|------------------------------------|----------------------------|-------------------------|
-| ketadb_version                     | latest                     | ketadb的版本号，如：v1.2.2.1   |
-| ketadb_install_file                | /tmp/ketadb.tar.gz         | ketadb的安装包路径            |
-| ketadb_run_user                    | keta                       | ketadb的用户               |
-| ketadb_root_path                   | /opt/ketadb                | ketadb的安装路径             |
-| ketadb_supervisor_program          | ketadb                     | ketadb的supervisor程序名    |
-| ketadb_supervisor_logfile          | /tmp/supervisor-ketadb.log | ketadb的supervisor日志路径   |
-| ketadb_supervisor_logfile_maxbytes | 50MB                       | ketadb的supervisor日志最大字节 |
-| ketadb_supervisor_logfile_backups  | 3                          | ketadb的supervisor日志备份数量 |
-| ketadb_heap_size                   | 2g                         | ketadb的运行时jvm堆内存大小      |
-| ketadb_config                      | ---                        | ketadb的`keta.yml`配置内容   |
-
-+ ketadb_config，常用参数如下：
-
-| 参数名                              | 默认值              | 描述                        |
-|----------------------------------|------------------|---------------------------|
-| cluster.name                     | "default"        | 集群名称                      |
-| network.host                     | "0.0.0.0"        | 程序监听IP                    |
-| http.port                        | 9200             | http端口                    |
-| transport.tcp.port               | 9300             | transport端口               |
-| node.master                      | "true"           | 是否为master节点               |
-| node.web                         | "true"           | 是否为web节点                  |
-| node.data                        | "true"           | 是否为data节点                 |
-| discovery.zen.ping.unicast.hosts | []               | 集群自动发现节点配置                |
-| keta.environment                 | "local"          | 部署环境                      |
-| keta.database.mysql.url          | "127.0.0.1:3306" | mysql地址                   |
-| keta.database.mysql.database     | "ketadb"         | mysql数据库名                 |
-| keta.database.mysql.user         | "keta"           | mysql用户                   |
-| keta.database.mysql.password     | "123456"         | mysql密码                   |
-| path.data                        | "../var/data"    | 仓库数据存储目录                  |
-| path.logs                        | "../var/logs"    | 平台日志存储目录                  |
