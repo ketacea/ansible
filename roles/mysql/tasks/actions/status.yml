@@ -1,7 +1,7 @@
-- name: Fetch mysql program status
-  shell: >-
-    {{ supervisor_bin_path }}/supervisorctl -c {{ supervisor_conf_path }} status {{ mysql_supervisor_program }}
-  register: mysql_program_status
+- name: Status mysql
+  shell: >- 
+    systemctl status {{ mysql_run_service }}.service 2>&1 || echo ' -> Please pay attention to viewing the logs.'
+  register: mysql_status
 
-- name: Show mysql program status
-  debug: var="mysql_program_status.stdout_lines"
+- name: Show mysql status
+  debug: msg="{{ mysql_status.stdout_lines }}"

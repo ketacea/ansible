@@ -1,1 +1,17 @@
 ---
+- name: reload ketadb service
+  become: yes
+  systemd:
+    name: "{{ ketadb_run_service }}"
+    daemon_reload: true
+
+- name: wait for ketadb working
+  wait_for:
+    port: "{{ ketadb_config_list['transport.tcp.port'] }}"
+    timeout: 60
+
+- name: wait for ketadb stopped
+  wait_for:
+    port: "{{ ketadb_config_list['transport.tcp.port'] }}"
+    state: drained
+    timeout: 60

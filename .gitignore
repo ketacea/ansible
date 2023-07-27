@@ -1,7 +1,2 @@
 .idea
 .ansible
-
-ansible.sh
-ansible-playbook.sh
-
-examples/**/*.retry

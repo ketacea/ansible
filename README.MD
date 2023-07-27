@@ -15,7 +15,6 @@ the services that can be installed from this repository are:
 You can find supported configuration variables in
 
 - [common variables](common_variables.md)
-- [supervisor variables](roles/supervisor/README.md)
 - [mysql variables](roles/mysql/README.md)
 - [ketadb variables](roles/ketadb/README.md)
 
@@ -32,7 +31,9 @@ Deploy KetaOps Platform in 3 steps with the Ansible Installer
     - Check that SSH is installed by running the following:
       - ```ssh -V```
     - Check that Ansible v2.11+ is installed by running the following:
-        - ```ansible --version```
+      - ```ansible --version```
+    - Check the dependency packages of MySQL server:
+      - ```sudo apt install -y libaio1 libncurses5```
 
 #### Machine
 
@@ -55,12 +56,19 @@ install ketaops service
 
 #### Download && Install
 - Run the following command to download the Keta Ansible Playbook:
-```
+```shell
 ansible-galaxy collection install git+https://gitee.com/xishuhq/keta-ansible.git
 ```
-```
+
+```shell
 git clone git@gitee.com:xishuhq/keta-ansible.git
 ansible-galaxy collection install --force ./keta-ansible
+```
+
+- Download packages: `MySQL (8.0.33)` and `KetaDB (1.2.2.1)`
+```shell
+wget https://dev.mysql.com/get/Downloads/MySQL-8.0/mysql-8.0.33-linux-glibc2.17-x86_64-minimal.tar.xz -O /tmp/mysql-8.0.33.tar.xz
+wget https://phoenix-public-1312700048.cos.ap-shanghai.myqcloud.com/ketadb-release/1.2.2.x/ketadb/keta-v1.2.2.1-apps.tar.gz -O /tmp/keta-v1.2.2.1-apps.tar.gz
 ```
 
 - Copy the following into a file called ansible.cfg that can be saved in the current directory
@@ -104,34 +112,3 @@ all:
 | `/opt/ketaops/log`     | 日志   |
 | `/opt/ketaops/var`     | 数据   |
 | `/opt/ketaops/package` | 安装包  |
-
-## 各组件版本兼容列表
-
-| ketadb   | mysql  | supervisor |
-|----------|--------|------------|
-| v1.2.2.1 | 8.0.33 | -          |
-
-## 准备环境
-
-+ 使用docker创建测试环境
-
-```shell
-make docker-create
-
-# 清理命令
-make docker-clean
-```
-
-## Ansible
-
-```shell
-# 默认支持linux
-make ansible-install
-
-# mac环境安装如下
-make ansible-mac-install 
-```
-
-## Poc部署
-
-POC环境，详细文档：[POC文档](examples/README.MD)

@@ -1,6 +1,3 @@
 ---
 
-supervisor_bin_path: /home/{{ ketadb_run_user }}/.local/bin
-supervisor_conf_path: /opt/ksupervisor/supervisor.conf
-
 ketadb_config_list: "{{ ketadb_config_default | combine(ketadb_config, recursive=True) }}"

@@ -1,0 +1,12 @@
+[Unit]
+Description=Keta MySQL Service
+
+[Service]
+Restart=on-failure
+RestartSec=30s
+User={{ ansible_user }}
+ExecStart={{ mysql_root_path }}/mysql.link/bin/mysqld --defaults-file={{ mysql_conf_path }}/my.cnf
+
+[Install]
+WantedBy=multi-user.target
+Alias={{ mysql_run_service }}.service

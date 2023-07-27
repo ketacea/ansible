@@ -1,25 +1,33 @@
-- name: Check if ketadb is installed
-  stat:
-    path: "{{ ketadb_root_path }}"
-  register: ketadb_install_check
+- name: Disable ketadb
+  become: yes
+  systemd:
+    name: "{{ ketadb_run_service }}"
+    enabled: no
+  ignore_errors: true
 
 - name: Stop ketadb
-  supervisorctl:
-    name: "{{ ketadb_supervisor_program }}"
+  become: yes
+  systemd:
+    name: "{{ ketadb_run_service }}"
     state: stopped
-    config: "{{ supervisor_conf_path }}"
-    supervisorctl_path: "{{ supervisor_bin_path }}/supervisorctl"
-  when: ketadb_install_check.stat.exists
+  ignore_errors: true
 
-- name: Remove ketadb from supervisor
+- name: Force kill ketadb
+  become: yes
   shell: >-
-    {{ supervisor_bin_path }}/supervisorctl -c {{ supervisor_conf_path }} remove {{ ketadb_supervisor_program }}
+    ps -ef | grep -v grep | grep -w '{{ ketadb_root_path }}/ketadb.link/bin/keta' | awk '{print $2}' | xargs kill -9 || echo 0
+  ignore_errors: true
 
-- name: Delete ketadb files
+- name: Ensure ketadb associated directories removed
   become: yes
   file:
     path: "{{ item }}"
     state: absent
   loop:
+    - "/etc/systemd/system/{{ ketadb_run_service }}.service"
+    - "{{ ketadb_conf_path }}"
+    - "{{ ketadb_data_path }}"
+    - "{{ ketadb_logs_path }}"
     - "{{ ketadb_root_path }}"
-    - "/opt/ksupervisor/conf.d/{{ ketadb_supervisor_program }}.conf"
+    - "{{ ketadb_pkgs_path }}"
+  ignore_errors: true

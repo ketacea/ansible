@@ -2,9 +2,9 @@
 dependencies: []
 
 galaxy_info:
-  role_name: mysql
+  role_name: ketadb
   author: keta
-  description: MySQL (process state manager) for KetaOps.
+  description: KetaDB (process state manager) for KetaOps.
   issue_tracker_url: https://e.gitee.com/xishuhq/repos/xishuhq/keta-ansible/sources
   company: "KetaOps"
   license: "Null"

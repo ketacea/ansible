@@ -1,5 +1,0 @@
-- name: Start supervisor
-  become: yes
-  systemd:
-    name: ksupervisord
-    state: started

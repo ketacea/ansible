@@ -1,23 +1,84 @@
-- name: Check if ketadb is installed
+- name: Check if install for the first time
   stat:
-    path: "{{ ketadb_root_path }}/{{ ketadb_version }}/install.tag"
-  register: ketadb_install_check
+    path: "{{ ketadb_data_path }}/ketadb.installed"
+  register: ketadb_init_check
 
-- name: Ensure ketadb installed
-  fail: msg="Ketadb is not installed."
-  when: not ketadb_install_check.stat.exists
+- name: Stop existed ketadb
+  become: yes
+  systemd:
+    name: "{{ ketadb_run_service }}"
+    state: stopped
+  ignore_errors: true
+  when: not ketadb_init_check.stat.exists
 
-- name: Copy ketadb init file into place for ketadb
+- name: Disable existed ketadb
+  become: yes
+  systemd:
+    name: "{{ ketadb_run_service }}"
+    enabled: no
+  ignore_errors: true
+  when: not ketadb_init_check.stat.exists
+
+- name: Ensure no ketadb running for init ketadb
+  become: yes
+  shell: >-
+    ps -ef | grep -v grep | grep -w '{{ ketadb_root_path }}/ketadb.link/bin/keta' | awk '{print $2}' | xargs kill -9 || echo 0
+  ignore_errors: true
+  when: not ketadb_init_check.stat.exists
+
+- name: Replace ketadb link of workspace
+  file:
+    src: "{{ ketadb_root_path }}/{{ ketadb_version }}"
+    dest: "{{ ketadb_root_path }}/ketadb.link"
+    state: link
+  when: not ketadb_init_check.stat.exists
+
+- name: Clear ketadb data and logs for initization
+  become: yes
+  file:
+    path: "{{ item }}"
+    state: absent
+  loop:
+    - "{{ ketadb_data_path }}"
+    - "{{ ketadb_logs_path }}"
+  when: not ketadb_init_check.stat.exists
+
+- name: Ensure ketadb associated directories exists
+  become: yes
+  file:
+    path: "{{ item }}"
+    state: directory
+    mode: 0755
+    owner: "{{ ansible_user }}"
+    group: "{{ ansible_user }}"
+    recurse: yes
+  loop:
+    - "{{ ketadb_conf_path }}"
+    - "{{ ketadb_logs_path }}"
+    - "{{ ketadb_data_path }}"
+
+- name: Copy ketadb keta.yml into place for ketadb
   template:
     src: keta.yml.j2
-    dest: "{{ ketadb_root_path }}/{{ ketadb_version }}/config/keta.yml"
+    dest: "{{ ketadb_conf_path }}/keta.yml"
 
-- name: Copy ketadb init file into place for jvm options
+- name: Copy ketadb jvm.options into place for ketadb
   template:
     src: jvm.options.j2
-    dest: "{{ ketadb_root_path }}/{{ ketadb_version }}/config/jvm.options"
+    dest: "{{ ketadb_conf_path }}/jvm.options"
 
-- name: Touch the tag file for checking the config changed
+- name: Copy ketadb keta.key into place for ketadb
+  template:
+    src: keta.key.j2
+    dest: "{{ ketadb_conf_path }}/keta.key"
+
+- name: Copy ketadb log4j2.properties into place for ketadb
+  template:
+    src: log4j2.properties.j2
+    dest: "{{ ketadb_conf_path }}/log4j2.properties"
+
+- name: Touch the tag file for checking initization
   file:
-    path: "{{ ketadb_root_path }}/{{ ketadb_version }}/config.tag"
+    path: "{{ ketadb_data_path }}/ketadb.installed"
     state: touch
+  when: not ketadb_init_check.stat.exists

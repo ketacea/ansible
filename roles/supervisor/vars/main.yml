@@ -1,6 +1,0 @@
----
-
-supervisor_install_dependencies: ["setuptools-40.6.3", "meld3-1.0.2", "supervisor-3.3.3"]
-
-supervisor_bin_path: /home/{{ supervisor_run_user }}/.local/bin
-supervisor_conf_path: /opt/ksupervisor/supervisor.conf

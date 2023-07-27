@@ -1,3 +1,6 @@
-{% for key in ketadb_config_list %}
-{{key}}: {{ketadb_config_list[key] | to_json }}
+{% for key in ketadb_config_list if key not in ['path.data', 'path.logs'] %}
+{{ key }}: {{ ketadb_config_list[key] | to_json }}
 {% endfor %}
+
+path.data: "{{ ketadb_data_path }}"
+path.logs: "{{ ketadb_logs_path }}"

@@ -1,5 +1,0 @@
-- name: Stop supervisor
-  become: yes
-  systemd:
-    name: ksupervisord
-    state: stopped

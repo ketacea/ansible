@@ -1,20 +1,20 @@
 ---
 
 mysql_install_file: /tmp/mysql-8.0.33.tar.xz
+mysql_version: 8.0.33
 
-mysql_run_user: keta
-mysql_run_pass: 123456
-mysql_run_port: 3306
+mysql_run_service: kmysql
 
-mysql_root_path: /opt/mysql
-mysql_data_path: /opt/mysql/data
-mysql_logs_path: /opt/mysql/logs
+mysql_username: keta
+mysql_password: 654321
+mysql_port: 13306
+
+mysql_root_path: /opt/ketaops/lib/mysql
+mysql_conf_path: /opt/ketaops/etc/mysql
+mysql_data_path: /opt/ketaops/var/mysql
+mysql_logs_path: /opt/ketaops/log/mysql
+mysql_pkgs_path: /opt/ketaops/package/mysql
 
 mysql_timezone: +08:00
 mysql_character: utf8mb4
 mysql_collation: utf8mb4_unicode_ci
-
-mysql_supervisor_program: keta-mysql
-mysql_supervisor_logfile: /tmp/supervisor-keta-mysql.log
-mysql_supervisor_logfile_maxbytes: 50MB
-mysql_supervisor_logfile_backups: 3

@@ -1,7 +1,8 @@
-- name: Fetch ketadb program status
+- name: Status ketadb
   shell: >-
-    {{ supervisor_bin_path }}/supervisorctl -c {{ supervisor_conf_path }} status {{ ketadb_supervisor_program }}
-  register: ketadb_program_status
+    systemctl status {{ ketadb_run_service }}.service 2>&1 || echo ' -> Please pay attention to viewing the logs.'
+  register: ketadb_status
+  ignore_errors: true
 
-- name: Show ketadb program status
-  debug: var="ketadb_program_status.stdout_lines"
+- name: Show ketadb status
+  debug: msg="{{ ketadb_status.stdout_lines }}"

@@ -1,14 +1,10 @@
-- include_tasks:
-    file: check.yml
-
 - name: Start ketadb
-  supervisorctl:
-    name: "{{ ketadb_supervisor_program }}"
+  become: true
+  systemd:
+    name: "{{ ketadb_run_service }}"
     state: started
-    config: "{{ supervisor_conf_path }}"
-    supervisorctl_path: "{{ supervisor_bin_path }}/supervisorctl"
+  notify:
+    - wait for ketadb working
 
-- name: Wait for ketadb starting within 120s
-  wait_for:
-    port: "{{ ketadb_config_list['transport.tcp.port'] }}"
-    timeout: 120
+- include_tasks:
+    file: status.yml

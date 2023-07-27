@@ -1,36 +1,92 @@
-- name: Copy mysql init file into place for mysqld
-  template:
-    src: my.cnf.j2
-    dest: "{{ mysql_root_path }}/my.cnf"
-
 - name: Check if install for the first time
   stat:
-    path: "{{ mysql_logs_path }}/error.log"
-  register: mysql_first_check
+    path: "{{ mysql_data_path }}/keta.mysql.initialized"
+  register: mysql_init_check
+
+- name: Stop existed keta mysql
+  become: yes
+  systemd:
+    name: "{{ mysql_run_service }}"
+    state: stopped
+    enabled: no
+  ignore_errors: true
+  when: not mysql_init_check.stat.exists
+
+- name: Disable existed keta mysql
+  become: yes
+  systemd:
+    name: "{{ mysql_run_service }}"
+    enabled: no
+  ignore_errors: true
+  when: not mysql_init_check.stat.exists
+
+- name: Ensure no mysql running for init mysql
+  become: yes
+  shell: >-
+    ps -ef | grep -v grep | grep -w '{{ mysql_root_path }}/mysql.link/bin/mysqld' | awk '{print $2}' | xargs kill -9 || echo 0
+  ignore_errors: true
+  when: not mysql_init_check.stat.exists
+
+- name: Replace mysql link of workspace
+  file:
+    src: "{{ mysql_root_path }}/{{ mysql_version }}"
+    dest: "{{ mysql_root_path }}/mysql.link"
+    state: link
+  when: not mysql_init_check.stat.exists
+
+- name: Clear mysql data and logs for initization
+  become: yes
+  file:
+    path: "{{ item }}"
+    state: absent
+  loop:
+    - "{{ mysql_data_path }}"
+    - "{{ mysql_logs_path }}"
+  when: not mysql_init_check.stat.exists
+
+- name: Ensure mysql associated directories exists
+  become: yes
+  file:
+    path: "{{ item }}"
+    state: directory
+    mode: 0755
+    owner: "{{ ansible_user }}"
+    group: "{{ ansible_user }}"
+    recurse: yes
+  loop:
+    - "{{ mysql_conf_path }}"
+    - "{{ mysql_logs_path }}"
+    - "{{ mysql_data_path }}"
+
+- name: Copy mysql init file into place for mysqld
+  template:
+    src: mysql.conf.j2
+    dest: "{{ mysql_conf_path }}/my.cnf"
 
 - name: Fetch temporary password for init mysql
   shell: >-
-    {{ mysql_root_path }}/bin/mysqld --defaults-file={{ mysql_root_path }}/my.cnf --initialize && 
+    {{ mysql_root_path }}/mysql.link/bin/mysqld --defaults-file={{ mysql_conf_path }}/my.cnf --initialize && 
     cat {{ mysql_logs_path }}/error.log | grep 'temporary password' | awk '{print $NF}'
   register: mysql_temporary_password
-  when: not mysql_first_check.stat.exists
+  when: not mysql_init_check.stat.exists
 
 - name: Check temporary password exists
-  fail: msg="Cannot find temporary password from log"
-  when: not mysql_first_check.stat.exists and mysql_temporary_password.stdout | length() == 0
+  fail: msg="Cannot find temporary password from log, you must uninstall and install again"
+  when: not mysql_init_check.stat.exists and mysql_temporary_password.stdout | length() == 0
 
-- name: Init mysql and reset user
+- name: Change mysql initialized password
   shell: >-
-    {{ mysql_root_path }}/bin/mysqld --defaults-file={{ mysql_root_path }}/my.cnf --daemonize && sleep 5 &&
-    {{ mysql_root_path }}/bin/mysql -S {{ mysql_root_path }}/mysql.sock -uroot -p"{{mysql_temporary_password.stdout}}" --connect-expired-password -e "
-    alter user 'root'@'localhost' identified with mysql_native_password by '{{ mysql_run_user }}';
-    create user '{{ mysql_run_user }}'@'%' identified with mysql_native_password by '{{ mysql_run_pass }}';
-    grant all privileges on *.* to '{{ mysql_run_user }}'@'%' with grant option;
+    {{ mysql_root_path }}/mysql.link/bin/mysqld --defaults-file={{ mysql_conf_path }}/my.cnf --daemonize && sleep 5 &&
+    {{ mysql_root_path }}/mysql.link/bin/mysql -S {{ mysql_root_path }}/mysql.sock -uroot -p"{{mysql_temporary_password.stdout}}" --connect-expired-password -e "
+    alter user 'root'@'localhost' identified with mysql_native_password by '{{ mysql_username }}';
+    create user '{{ mysql_username }}'@'%' identified with mysql_native_password by '{{ mysql_password }}';
+    grant all privileges on *.* to '{{ mysql_username }}'@'%' with grant option;
     flush privileges;" &&
     cat {{ mysql_root_path }}/mysql.pid | xargs kill
-  when: not mysql_first_check.stat.exists
+  when: not mysql_init_check.stat.exists
 
-- name: Touch the tag file for checking the config changed
+- name: Touch the tag file for checking initization
   file:
-    path: "{{ mysql_root_path }}/config.tag"
+    path: "{{ mysql_data_path }}/keta.mysql.initialized"
     state: touch
+  when: not mysql_init_check.stat.exists

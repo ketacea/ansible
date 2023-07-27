@@ -1,4 +1,5 @@
 ---
-- import_playbook: ketadb.yml
 
 - import_playbook: mysql.yml
+
+- import_playbook: ketadb.yml

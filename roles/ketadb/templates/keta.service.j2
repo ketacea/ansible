@@ -1,0 +1,13 @@
+[Unit]
+Description=Keta {{ ketadb_run_service }} Service
+
+[Service]
+Restart=on-failure
+RestartSec=30s
+User={{ ansible_user }}
+ExecStart={{ ketadb_root_path }}/ketadb.link/bin/keta
+Environment="KETA_PATH_CONF={{ ketadb_conf_path }}"
+
+[Install]
+WantedBy=multi-user.target
+Alias={{ ketadb_run_service }}.service

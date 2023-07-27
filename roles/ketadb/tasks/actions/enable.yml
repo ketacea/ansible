@@ -1,0 +1,13 @@
+- name: Replace ketadb link of workspace
+  file:
+    src: "{{ ketadb_root_path }}/{{ ketadb_version }}"
+    dest: "{{ ketadb_root_path }}/ketadb.link"
+    state: link
+
+- name: Copy ketadb service into place for systemd
+  become: yes
+  template:
+    src: keta.service.j2
+    dest: "/etc/systemd/system/{{ ketadb_run_service }}.service"
+  notify:
+    - reload ketadb service

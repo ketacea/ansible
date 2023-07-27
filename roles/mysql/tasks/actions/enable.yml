@@ -1,0 +1,13 @@
+- name: Replace mysql link of workspace
+  file:
+    src: "{{ mysql_root_path }}/{{ mysql_version }}"
+    dest: "{{ mysql_root_path }}/mysql.link"
+    state: link
+
+- name: Copy mysql service into place for systemd
+  become: yes
+  template:
+    src: mysql.service.j2
+    dest: "/etc/systemd/system/{{ mysql_run_service }}.service"
+  notify:
+    - reload mysql service

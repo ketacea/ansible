@@ -1,7 +1,0 @@
-- name: Fetch supervisor program status
-  shell: >-
-    {{ supervisor_bin_path }}/supervisord -c {{ supervisor_conf_path }} status
-  register: program_status
-
-- name: Show supervisor program status
-  debug: var="program_status.stdout_lines"

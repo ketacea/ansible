@@ -1,38 +1,40 @@
 - name: Check if ketadb is installed
   stat:
-    path: "{{ ketadb_root_path }}/{{ ketadb_version }}/install.tag"
+    path: "{{ ketadb_pkgs_path }}/ketadb_{{ ketadb_version }}.installed"
   register: ketadb_install_check
 
-- name: Ensure ketadb not install
-  fail: msg="Ketadb is installed."
+- name: Ensure ketadb is not installed
+  fail: msg="ketadb {{ ketadb_version }} is installed."
   when: ketadb_install_check.stat.exists
 
-- name: Ensure ketadb packages and workspace directory exists
+- name: Ensure ketadb associated directories exists
   become: yes
   file:
     path: "{{ item }}"
     state: directory
     mode: 0755
-    owner: "{{ ketadb_run_user }}"
-    group: "{{ ketadb_run_user }}"
+    owner: "{{ ansible_user }}"
+    group: "{{ ansible_user }}"
     recurse: yes
   loop:
+    - "{{ ketadb_pkgs_path }}"
     - "{{ ketadb_root_path }}"
     - "{{ ketadb_root_path }}/{{ ketadb_version }}"
 
-- name: Copy ketadb install file into tmp directory
+- name: Copy ketadb install file into package directory
   copy:
     src: "{{ ketadb_install_file }}"
-    dest: "/tmp/ketadb.install.file"
+    dest: "{{ ketadb_pkgs_path }}/ketadb_{{ ketadb_version }}.z"
 
 - name: Unarchive ketadb install file to workspace
   unarchive:
-    src: "/tmp/ketadb.install.file"
+    src: "{{ ketadb_pkgs_path }}/ketadb_{{ ketadb_version }}.z"
     dest: "{{ ketadb_root_path }}/{{ ketadb_version }}"
     extra_opts: "--strip-components=1"
     remote_src: yes
+    creates: "{{ ketadb_root_path }}/{{ ketadb_version }}/bin/keta"
 
 - name: Touch the tag file for checking installed
   file:
-    path: "{{ ketadb_root_path }}/{{ ketadb_version }}/install.tag"
+    path: "{{ ketadb_pkgs_path }}/ketadb_{{ ketadb_version }}.installed"
     state: touch

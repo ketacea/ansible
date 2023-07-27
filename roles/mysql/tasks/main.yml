@@ -15,6 +15,14 @@
     - config
 
 - include_tasks:
+    file: actions/enable.yml
+    apply:
+      tags:
+        - enable
+  tags:
+    - enable
+
+- include_tasks:
     file: actions/start.yml
     apply:
       tags:

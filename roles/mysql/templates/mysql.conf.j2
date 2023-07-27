@@ -1,0 +1,20 @@
+[mysqld]
+basedir={{ mysql_root_path }}/mysql.link
+datadir={{ mysql_data_path }}
+log-error={{ mysql_logs_path }}/error.log
+pid-file={{ mysql_root_path }}/mysql.pid
+socket={{ mysql_root_path }}/mysql.sock
+port={{ mysql_port }}
+
+default-time-zone='{{ mysql_timezone }}'
+innodb_file_per_table=1
+default-storage-engine=innodb
+max_allowed_packet=1024M
+character_set_server={{ mysql_character }}
+collation-server={{ mysql_collation }}
+
+[mysql]
+default-character-set={{ mysql_character }}
+
+[client]
+default-character-set={{ mysql_character }}

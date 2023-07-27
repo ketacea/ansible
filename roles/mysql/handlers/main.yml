@@ -1,1 +1,17 @@
 ---
+- name: reload mysql service
+  become: yes
+  systemd:
+    name: "{{ mysql_run_service }}"
+    daemon_reload: true
+
+- name: wait for mysql working
+  wait_for:
+    port: "{{ mysql_port }}"
+    timeout: 60
+
+- name: wait for mysql stopped
+  wait_for:
+    port: "{{ mysql_port }}"
+    state: drained
+    timeout: 60
