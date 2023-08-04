@@ -3,12 +3,10 @@
 Ansible provides a simple way to deploy, manage and configure the ketaops platform. Specifically this repository:
 
 - Installs KetaOps Platform packages
-- Starts services using supervisor
 - Provides configuration options
 
 the services that can be installed from this repository are:
 
-- supervisor - like systemd,daemon mysql, ketadb etc
 - mysql - meta database
 - ketadb - the observability backend, frontend and database
 
@@ -17,7 +15,6 @@ You can find supported configuration variables in
 - [common variables](common_variables.md)
 - [mysql variables](roles/mysql/README.md)
 - [ketadb variables](roles/ketadb/README.md)
--
 
 # structure
 
@@ -58,10 +55,6 @@ Get machine list:
 
 install ketaops service
 
-- Tree supervisor instance on
-    - 192.168.1.1
-    - 192.168.1.2
-    - 192.168.1.3
 - A mysql instance on
     - 192.168.1.1
 - Tree ketadb instance on
@@ -143,7 +136,7 @@ ansible-playbook -i hosts.yml ketaops.platform.ketadb -K -t  install,config,enab
 
 ```shell 
 ansible-playbook -i hosts.yml ketaops.platform.mysql -K -t  install
-ansible-playbook -i hosts.yml ketaops.platform.mysql -K -t config
+ansible-playbook -i hosts.yml ketaops.platform.mysql -K -t  config
 ansible-playbook -i hosts.yml ketaops.platform.mysql -K -t  enable
 ansible-playbook -i hosts.yml ketaops.platform.mysql -K -t  start
 ```
