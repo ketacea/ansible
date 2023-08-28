@@ -1,8 +1,8 @@
 # introduction
 
-Ansible provides a simple way to deploy, manage and configure the ketaops platform. Specifically this repository:
+Ansible provides a simple way to deploy, manage and configure the Ketacea platform. Specifically this repository:
 
-- Installs KetaOps Platform packages
+- Installs Ketacea Platform packages
 - Provides configuration options
 
 the services that can be installed from this repository are:
@@ -20,19 +20,19 @@ You can find supported configuration variables in
 
 | path                   | desc        |
 |------------------------|-------------|
-| `/opt/ketaops/lib`     | application |
-| `/opt/ketaops/etc`     | config file |
-| `/opt/ketaops/log`     | logs        |
-| `/opt/ketaops/var`     | data dir    |
-| `/opt/ketaops/package` | package dir |
+| `/opt/Ketacea/lib`     | application |
+| `/opt/Ketacea/etc`     | config file |
+| `/opt/Ketacea/log`     | logs        |
+| `/opt/Ketacea/var`     | data dir    |
+| `/opt/Ketacea/package` | package dir |
 
 # Installation
 
-Deploy KetaOps Platform in 3 steps with the Ansible Installer
+Deploy Ketacea Platform in 3 steps with the Ansible Installer
 
 #### Requirement
 
-1. The ability to reach ketaops's software package repository at phoenix-public-1312700048.cos.ap-shanghai.myqcloud.com
+1. The ability to reach Ketacea's software package repository at phoenix-public-1312700048.cos.ap-shanghai.myqcloud.com
 2. At least 2 vCPUs, 8GB of RAM, and 8GB of storage.
 3. RHEL/CentOS 7.x, RHEL/CentOS 8.x, Debian 9, Ubuntu 16.04 LTS, or Ubuntu 18.04 LTS operating system.
 4. Installed Software
@@ -53,7 +53,7 @@ Get machine list:
 - 192.168.1.2
 - 192.168.1.3
 
-install ketaops service
+install Ketacea service
 
 - A mysql instance on
     - 192.168.1.1
@@ -109,7 +109,7 @@ all:
 
 - Run the following command:
 
-```ansible-playbook -i hosts.yml ketaops.platform.all -K -t install,config,enable,start```
+```ansible-playbook -i hosts.yml Ketacea.platform.all -K -t install,config,enable,start```
 
 # FQA
 
@@ -128,31 +128,31 @@ all:
 #### 2. install mysql then install ketadb
 
 ```shell
-ansible-playbook -i hosts.yml ketaops.platform.mysql -K -t  install,config,enable,start
-ansible-playbook -i hosts.yml ketaops.platform.ketadb -K -t  install,config,enable,start
+ansible-playbook -i hosts.yml Ketacea.platform.mysql -K -t  install,config,enable,start
+ansible-playbook -i hosts.yml Ketacea.platform.ketadb -K -t  install,config,enable,start
 ```
 
 #### 3. one by one install mysql 
 
 ```shell 
-ansible-playbook -i hosts.yml ketaops.platform.mysql -K -t  install
-ansible-playbook -i hosts.yml ketaops.platform.mysql -K -t  config
-ansible-playbook -i hosts.yml ketaops.platform.mysql -K -t  enable
-ansible-playbook -i hosts.yml ketaops.platform.mysql -K -t  start
+ansible-playbook -i hosts.yml Ketacea.platform.mysql -K -t  install
+ansible-playbook -i hosts.yml Ketacea.platform.mysql -K -t  config
+ansible-playbook -i hosts.yml Ketacea.platform.mysql -K -t  enable
+ansible-playbook -i hosts.yml Ketacea.platform.mysql -K -t  start
 ```
 ### 4. restart one ketadb instance `keta-1` or one ketadb group `keta`
 ```shell
-ansible-playbook --limit keta-1 -i hosts.yml ketaops.platform.ketadb -K -t restart
-ansible-playbook --limit keta -i hosts.yml ketaops.platform.ketadb -K -t restart
+ansible-playbook --limit keta-1 -i hosts.yml Ketacea.platform.ketadb -K -t restart
+ansible-playbook --limit keta -i hosts.yml Ketacea.platform.ketadb -K -t restart
 ```
 ### 4. how to debug 
 ```shell
-ansible all -m shell -a 'ls /opt/ketaops'
-ansible ketadb -m shell -a 'ls /opt/ketaops' 
+ansible all -m shell -a 'ls /opt/Ketacea'
+ansible ketadb -m shell -a 'ls /opt/Ketacea' 
 ansible keta-1 -m shel -a 'ls /opt/keatops'
 ```
 
 ### 5. how to check hosts.yml syntax
 ```shell
-ansible-playbook -i hosts.yml --syntax-check ketaops.platform.all
+ansible-playbook -i hosts.yml --syntax-check Ketacea.platform.all
 ```
